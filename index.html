@@ -11,18 +11,19 @@
 
 	</head>
 	<body>
+
 		<div class="container">
 		  <div class="row">
 			<div class="col-sm-2">
 				
 				<div class ="row">
-					<input type="text" name="search" placeholder="Search..">
+					<p>Filter: <input data-bind="value: filter, valueUpdate: 'afterkeydown'" /></p>
 				</div>
 
 				<div class="row">
-					<ul>
+					<ul data-bind="foreach: filteredList">
 						<li>
-							<p>list stuff</p>
+							<p data-bind="text: name"></p>
 						</li>
 					</ul>
 				</div>
@@ -44,12 +45,8 @@
 
 
 		<script src="https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/markerclusterer.js">
+		</script>
 
-		<script src="https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/markerclusterer.js">
-		</script>
-		<script async defer
-		src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBkABM9uNs6ZCsYcJUj4aMjQIyvSE3S9k4&callback=initMap">
-		</script>
 
 		
 		<script src="js/knockout-3.4.1.js"></script>
