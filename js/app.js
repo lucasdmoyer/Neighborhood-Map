@@ -1,7 +1,7 @@
 function initMap() {
 
 	var map = new google.maps.Map(document.getElementById('map'), {
-			zoom: 15,
+			zoom: 14,
 			center: {lat: 44.636, lng: -124.053},
 			mapTypeId: 'satellite'
 		});
@@ -17,15 +17,18 @@ function initMap() {
 			title: data.name,
 			label: data.name,
 			content: data.description,
-			animation:null
-		
+			animation:null,
+			id:data.id
 		});
-
-		//marker.addListener('click', toggleBounce);
 
 		model.gmarkers.push(marker);
 	}
 	for (i=0; i<model.locations.length; i++) {
+		console.log(model.gmarkers)
+		model.gmarkers[i].addListener('click', function() {
+			animarker(this.id);
+        });
+
 		google.maps.event.addListener(model.gmarkers[i], 'click', function() {
 	        new google.maps.InfoWindow({
 	            content: this.content
@@ -45,14 +48,35 @@ var model = {
             name : 'Starbucks',
             lat : 44.637453,
             lng : -124.052610,
-            description: "A place to use the fast internet"
+            description: "Starbucks: A place to use the fast internet"
         },
         {	
         	id: 1,
             name : 'JC Thriftway',
             lat : 44.637398,
             lng : -124.053980,
-            description: "Where I go grocery shopping"
+            description: "JC Thriftway: Where I go grocery shopping"
+        },
+        {
+        	id: 2,
+        	name:"Newport Rec Center",
+        	lat: 44.634771,
+        	lng: -124.051447,
+        	description: "Newport Rec Center: I like to work out here after work"
+        },
+        {
+        	id: 3,
+        	name: "Oregon Coast Aquarium",
+        	lat: 44.617536,
+        	lng: -124.07303,
+        	description: "Oregon Coast Aquarium: The place I first lived in Newport"
+        }, 
+        {
+        	id: 4,
+        	name: "Southwest Jetty Way",
+        	lat: 44.614901, 
+        	lng:-124.063831,
+        	description: "South Jetty: I would go running here on the weekends"
         }
     ],
     filteredLocations : []
@@ -60,6 +84,7 @@ var model = {
 }
 
 function bounce() {
+	getNews(model.gmarkers[this.id].content);
 	model.map[0].setCenter(new google.maps.LatLng(this.lat,this.lng));
 	model.map[0].setZoom( Math.max(17, model.map[0].getZoom()) );
 	model.gmarkers[this.id].setAnimation(google.maps.Animation.BOUNCE);
@@ -67,10 +92,16 @@ function bounce() {
     //do what you need here
 	}, 1000);
 	model.gmarkers[this.id].setAnimation(null);
-
-
 }
 
+function animarker(id) {
+	getNews(model.gmarkers[id].content);
+	model.gmarkers[id].setAnimation(google.maps.Animation.BOUNCE);
+	setTimeout(function(){
+	}, 1000);
+	model.gmarkers[id].setAnimation(null);
+
+}
 // Class to represent a row in the seat reservations grid
 var Location = function(id, name, lat, lng) {
     var self = this;
@@ -157,9 +188,40 @@ var ViewModel = function() {
 			}
 		};
 	}
-	
-    
-	
+
+
 }
 
 
+function getNews(term) {
+	$('.article-list').empty();
+	var NYTKEY = '0f35bca23a904bc7a71e0ac4846e0b3d';
+    
+	var nytimesUrl = 'https://api.nytimes.com/svc/search/v2/articlesearch.json?q=' + term + '&sort=newest&api-key=' + NYTKEY;
+	$.getJSON(nytimesUrl, function(data){
+	    articles = data.response.docs;
+	    $('.article-list').append('Articles about '+ '<br>' + term)
+	    console.log(articles);
+	    if (articles.length ==0) {
+	    	$('.article-list').append('<br> <br>' + 'There are no articles');
+	    }
+
+	    for (var i = 0; i < articles.length; i ++) {
+	        if (i === 3) { break; }
+	        var article = articles[i];
+	        //Takes out paid death
+	        if (article.section_name != 'Paid Death Notices') {
+	            $('.article-list').append('<li class="article">' +
+	            '<h3>'+article.section_name+'</h3>'+
+	            '<a href="'+article.web_url+'">'+article.headline.main+ '</a>'+
+	                   '</li>');
+	        }
+	        
+	    };
+	})
+	document.getElementById('container').style.height = document.getElementById('articles');
+
+	return term;
+
+
+}

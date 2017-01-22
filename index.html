@@ -12,7 +12,7 @@
 	</head>
 	<body>
 
-		<div class="container">
+		<div class="container" id = "container">
 		  <div class="row">
 			<div class="col-sm-2">
 				
@@ -26,6 +26,11 @@
 							<p data-bind="text: name, click: bounce"></p>
 						</li>
 					</ul>
+				</div>
+
+				<div class="row" id = 'articles'>
+					<h3 id="nytimes-header">News Articles</h3>
+        			<ul id="nytimes-articles" class="article-list" data-bind="text: $(parent).articleTerm"> </ul>
 				</div>
 
 			</div>
