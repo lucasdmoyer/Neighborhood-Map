@@ -23,7 +23,6 @@ function initMap() {
 	}
 	// adds functionality to markers
 	for (i=0; i<model.locations.length; i++) {
-		console.log(model.gmarkers)
 		model.gmarkers[i].addListener('click', function() {
 			animarker(this.id);
         });
@@ -33,7 +32,7 @@ function initMap() {
 	        }).open(map, this);
 	    });
 	}
-	ko.applyBindings(new ViewModel())
+	ko.applyBindings(new ViewModel());
 }
 
 var model = {
@@ -85,25 +84,27 @@ function bounce() {
 	model.map[0].setZoom( Math.max(17, model.map[0].getZoom()) );
 	model.gmarkers[this.id].setAnimation(google.maps.Animation.BOUNCE);
 	setTimeout(function(){
+		model.gmarkers[this.id].setAnimation(null);
 	}, 1000);
-	model.gmarkers[this.id].setAnimation(null);
+	
 }
 // Makes markers bounce when marker is clicked
 function animarker(id) {
 	getNews(model.gmarkers[id].content);
 	model.gmarkers[id].setAnimation(google.maps.Animation.BOUNCE);
 	setTimeout(function(){
+		model.gmarkers[id].setAnimation(null);
 	}, 1000);
-	model.gmarkers[id].setAnimation(null);
+	
 }
 
 
-var Location = function(id, name, lat, lng) {
-    var self = this;
+var Location = function(id, name, lat, lng, description) {
     this.id = id;
     this.name = name;  
     this.lat =lat;
     this.lng =lng;
+    this.description = description;
 }
 
 var ViewModel = function() {
@@ -131,7 +132,7 @@ var ViewModel = function() {
 				} else {
 					model.gmarkers[i].setVisible(false);
 				}
-			};
+			}
 			return ko.utils.arrayFilter(self.locationList(), function(item){
 				var match = item.name.toLowerCase().indexOf(filter) >=0;
 				return match;
@@ -144,7 +145,6 @@ var ViewModel = function() {
 			model.gmarkers[i].setVisible(true);
 		}
 	} else {
-		console.log('yes filter');
 		var string = self.filter().toLowerCase();
 		for(i=0; i < self.locationList().length; i++) {
 			var str2 = model.gmarkers[i].name.toLowerCase();
@@ -157,6 +157,7 @@ var ViewModel = function() {
 	}
 }
 
+
 // New York Times api provides news based on description of location
 function getNews(term) {
 	$('.article-list').empty();
@@ -164,8 +165,8 @@ function getNews(term) {
 	var nytimesUrl = 'https://api.nytimes.com/svc/search/v2/articlesearch.json?q=' + term + '&sort=newest&api-key=' + NYTKEY;
 	$.getJSON(nytimesUrl, function(data){
 	    articles = data.response.docs;
-	    $('.article-list').append('Articles about '+ '<br>' + term)
-	    console.log(articles);
+	    //$('.article-list').append('Articles about '+ '<br>' + term);
+	    description = ko.observable(term);
 	    if (articles.length ==0) {
 	    	$('.article-list').append('<br> <br>' + 'There are no articles');
 	    }
@@ -176,13 +177,12 @@ function getNews(term) {
 	        //Takes out paid death
 	        if (article.section_name != 'Paid Death Notices') {
 	            $('.article-list').append('<li class="article">' +
-	            '<h3>'+article.section_name+'</h3>'+
 	            '<a href="'+article.web_url+'">'+article.headline.main+ '</a>'+
 	                   '</li>');
 	        }
 	        
 	    };
 	})
-	document.getElementById('container').style.height = document.getElementById('articles');
+	document.getElementById('container').style.height = document.getElementById('articles').style.height;
 	return term;
 }
