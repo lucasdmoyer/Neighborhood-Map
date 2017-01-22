@@ -2,9 +2,11 @@ function initMap() {
 
 	var map = new google.maps.Map(document.getElementById('map'), {
 			zoom: 15,
-			center: {lat: 44.636, lng: -124.053}
+			center: {lat: 44.636, lng: -124.053},
+			mapTypeId: 'satellite'
 		});
 	model.map.push(map);
+
 
 	for (i=0; i<model.locations.length; i++) {
 		var data = model.locations[i];
@@ -14,23 +16,17 @@ function initMap() {
 			map: map,
 			title: data.name,
 			label: data.name,
-			content: data.description
+			content: data.description,
+			animation:null
+		
 		});
-		var contentString = '<div id="content">'+
-            '<div id="siteNotice">'+
-            '</div>'+
-            '<h1 id="firstHeading" class="firstHeading">'+data.name+'</h1>'+
-            '<div id="bodyContent">'+
-            '<p>'+data.description+'!</p>'+
-            '</div>'+
-            '</div>';
+
+		//marker.addListener('click', toggleBounce);
+
 		model.gmarkers.push(marker);
 	}
 	for (i=0; i<model.locations.length; i++) {
-		console.log('looping');
 		google.maps.event.addListener(model.gmarkers[i], 'click', function() {
-			console.log(model.locations[i]);
-			console.log(model.gmarkers)
 	        new google.maps.InfoWindow({
 	            content: this.content
 	        }).open(map, this);
@@ -47,21 +43,33 @@ var model = {
         {
             id: 0,
             name : 'Starbucks',
-            lat : 44.63731107,
-            lng : -124.05294478,
+            lat : 44.637453,
+            lng : -124.052610,
             description: "A place to use the fast internet"
         },
         {	
         	id: 1,
             name : 'JC Thriftway',
-            lat : 44.63726527,
-            lng : -124.05372798,
+            lat : 44.637398,
+            lng : -124.053980,
             description: "Where I go grocery shopping"
         }
     ],
     filteredLocations : []
 
-}  
+}
+
+function bounce() {
+	model.map[0].setCenter(new google.maps.LatLng(this.lat,this.lng));
+	model.map[0].setZoom( Math.max(17, model.map[0].getZoom()) );
+	model.gmarkers[this.id].setAnimation(google.maps.Animation.BOUNCE);
+	setTimeout(function(){
+    //do what you need here
+	}, 1000);
+	model.gmarkers[this.id].setAnimation(null);
+
+
+}
 
 // Class to represent a row in the seat reservations grid
 var Location = function(id, name, lat, lng) {
