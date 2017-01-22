@@ -13,28 +13,50 @@ function initMap() {
 			position: {lat: data.lat, lng: data.lng},
 			map: map,
 			title: data.name,
-			label: data.name
+			label: data.name,
+			content: data.description
 		});
+		var contentString = '<div id="content">'+
+            '<div id="siteNotice">'+
+            '</div>'+
+            '<h1 id="firstHeading" class="firstHeading">'+data.name+'</h1>'+
+            '<div id="bodyContent">'+
+            '<p>'+data.description+'!</p>'+
+            '</div>'+
+            '</div>';
 		model.gmarkers.push(marker);
 	}
-	
+	for (i=0; i<model.locations.length; i++) {
+		console.log('looping');
+		google.maps.event.addListener(model.gmarkers[i], 'click', function() {
+			console.log(model.locations[i]);
+			console.log(model.gmarkers)
+	        new google.maps.InfoWindow({
+	            content: this.content
+	        }).open(map, this);
+	    });
+	}
+
 	ko.applyBindings(new ViewModel())
 }
 var model = {
 	map: [],
 	gmarkers :[],
+	infowindows:[],
 	locations: [
         {
             id: 0,
             name : 'Starbucks',
             lat : 44.63731107,
-            lng : -124.05294478
+            lng : -124.05294478,
+            description: "A place to use the fast internet"
         },
         {	
         	id: 1,
             name : 'JC Thriftway',
             lat : 44.63726527,
-            lng : -124.05372798
+            lng : -124.05372798,
+            description: "Where I go grocery shopping"
         }
     ],
     filteredLocations : []
@@ -91,12 +113,10 @@ var ViewModel = function() {
 		var filter = self.filter().toLowerCase();
 		if(!filter){
 			for (i=0; i<self.locationList().length; i ++) {
-				console.log('no filter');
 				model.gmarkers[i].setVisible(true);
 			}
 			return self.locationList();
 		}else{
-			console.log('yes filter');
 			var string = self.filter().toLowerCase();
 			for(i=0; i < self.locationList().length; i++) {
 				var str2 = model.gmarkers[i].title.toLowerCase();
@@ -112,11 +132,9 @@ var ViewModel = function() {
 			})
 		}
 	},ViewModel);
-	console.log(model.gmarkers);
 	var filter = self.filter().toLowerCase();
 	if (!filter) {
 		for (i=0; i<self.locationList().length; i ++) {
-			console.log('no filter');
 			model.gmarkers[i].setVisible(true);
 		}
 	} else {
@@ -131,18 +149,6 @@ var ViewModel = function() {
 			}
 		};
 	}
-	/*
-	for(i=0; i < self.filteredList().length; i++) {
-		var id = self.filteredList()[i].id;
-		takeMarker(i);
-		
-	};
-	for(i=0; i < self.filteredList().length; i++) {
-		var id = self.filteredList()[i].id;
-		putMarker(i);
-		
-	};
-	*/
 	
     
 	
