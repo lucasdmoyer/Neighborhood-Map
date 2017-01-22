@@ -1,13 +1,12 @@
 function initMap() {
-
+	// creates new map centered on Newport, Oregon
 	var map = new google.maps.Map(document.getElementById('map'), {
 			zoom: 14,
 			center: {lat: 44.636, lng: -124.053},
 			mapTypeId: 'satellite'
 		});
 	model.map.push(map);
-
-
+	// Adds markers for each location
 	for (i=0; i<model.locations.length; i++) {
 		var data = model.locations[i];
 		var latLng = new google.maps.LatLng(data.lat, data.lng);
@@ -20,24 +19,23 @@ function initMap() {
 			animation:null,
 			id:data.id
 		});
-
 		model.gmarkers.push(marker);
 	}
+	// adds functionality to markers
 	for (i=0; i<model.locations.length; i++) {
 		console.log(model.gmarkers)
 		model.gmarkers[i].addListener('click', function() {
 			animarker(this.id);
         });
-
 		google.maps.event.addListener(model.gmarkers[i], 'click', function() {
 	        new google.maps.InfoWindow({
 	            content: this.content
 	        }).open(map, this);
 	    });
 	}
-
 	ko.applyBindings(new ViewModel())
 }
+
 var model = {
 	map: [],
 	gmarkers :[],
@@ -68,7 +66,7 @@ var model = {
         	id: 3,
         	name: "Oregon Coast Aquarium",
         	lat: 44.617536,
-        	lng: -124.07303,
+        	lng: -124.047303,
         	description: "Oregon Coast Aquarium: The place I first lived in Newport"
         }, 
         {
@@ -79,30 +77,27 @@ var model = {
         	description: "South Jetty: I would go running here on the weekends"
         }
     ],
-    filteredLocations : []
-
 }
-
+// Makes markers bounce when list item is clicked
 function bounce() {
 	getNews(model.gmarkers[this.id].content);
 	model.map[0].setCenter(new google.maps.LatLng(this.lat,this.lng));
 	model.map[0].setZoom( Math.max(17, model.map[0].getZoom()) );
 	model.gmarkers[this.id].setAnimation(google.maps.Animation.BOUNCE);
 	setTimeout(function(){
-    //do what you need here
 	}, 1000);
 	model.gmarkers[this.id].setAnimation(null);
 }
-
+// Makes markers bounce when marker is clicked
 function animarker(id) {
 	getNews(model.gmarkers[id].content);
 	model.gmarkers[id].setAnimation(google.maps.Animation.BOUNCE);
 	setTimeout(function(){
 	}, 1000);
 	model.gmarkers[id].setAnimation(null);
-
 }
-// Class to represent a row in the seat reservations grid
+
+
 var Location = function(id, name, lat, lng) {
     var self = this;
     this.id = id;
@@ -111,35 +106,6 @@ var Location = function(id, name, lat, lng) {
     this.lng =lng;
 }
 
-function toggleMarkers() {
-  for (i = 0; i < model.gmarkers.length; i++) {
-    if (model.gmarkers[i].getMap() != null) model.gmarkers[i].setMap(null);
-    else model.gmarkers[i].setMap(model.map[0]);
-  }
-}
-
-function putMarker(id) {
-	console.log(id + 'put');
-	model.gmarkers[id].setVisible(true);
-}
-
-function takeMarker(id) {
-	console.log(id + 'take');
-	model.gmarkers[id].setVisible(false);
-}
-
-function putAllMarkers() {
-	for (i=0; i<ViewModel().locationList().length; i++) {
-		putMarker(i);
-	}
-}
-
-function takeAllMarkers() {
-	for (i=0; i<ViewModel().locationList().length; i++) {
-		takeMarker(i);
-	}
-}
-// Overall viewmodel for this screen, along with initial state
 var ViewModel = function() {
     var self = this;
     self.filter = ko.observable("");
@@ -148,6 +114,7 @@ var ViewModel = function() {
 		self.locationList().push(new Location(id= model.locations[i].id, name=model.locations[i].name, lat=model.locations[i].lat, lng=model.locations[i].lng))
 	}
 	
+	// Filters markers and list based on name
 	self.filteredList = ko.computed(function(){
 		var filter = self.filter().toLowerCase();
 		if(!filter){
@@ -188,15 +155,12 @@ var ViewModel = function() {
 			}
 		};
 	}
-
-
 }
 
-
+// New York Times api provides news based on description of location
 function getNews(term) {
 	$('.article-list').empty();
 	var NYTKEY = '0f35bca23a904bc7a71e0ac4846e0b3d';
-    
 	var nytimesUrl = 'https://api.nytimes.com/svc/search/v2/articlesearch.json?q=' + term + '&sort=newest&api-key=' + NYTKEY;
 	$.getJSON(nytimesUrl, function(data){
 	    articles = data.response.docs;
@@ -220,8 +184,5 @@ function getNews(term) {
 	    };
 	})
 	document.getElementById('container').style.height = document.getElementById('articles');
-
 	return term;
-
-
 }
