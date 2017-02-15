@@ -30,7 +30,11 @@
 
 				<div class="row" id = 'articles'>
 					<h3 id="nytimes-header">News Articles</h3>
-        			<ul id="nytimes-articles" class="article-list"> </ul>
+        			<ul data-bind="foreach: articleList">
+        				<li>
+        					<p data-bind="text: $index"></p>
+        				</li>
+        			</ul>
 				</div>
 
 			</div>

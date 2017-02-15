@@ -83,8 +83,9 @@ function bounce() {
 	model.map[0].setCenter(new google.maps.LatLng(this.lat,this.lng));
 	model.map[0].setZoom( Math.max(17, model.map[0].getZoom()) );
 	model.gmarkers[this.id].setAnimation(google.maps.Animation.BOUNCE);
+	var markerToStop = model.gmarkers[this.id];
 	setTimeout(function(){
-		model.gmarkers[this.id].setAnimation(null);
+		markerToStop.setAnimation(null);
 	}, 1000);
 	
 }
@@ -92,8 +93,9 @@ function bounce() {
 function animarker(id) {
 	getNews(model.gmarkers[id].content);
 	model.gmarkers[id].setAnimation(google.maps.Animation.BOUNCE);
+	var markerToStop = model.gmarkers[id];
 	setTimeout(function(){
-		model.gmarkers[id].setAnimation(null);
+		markerToStop.setAnimation(null);
 	}, 1000);
 	
 }
@@ -155,34 +157,29 @@ var ViewModel = function() {
 			}
 		};
 	}
+	self.articleList = ko.computed(function() {
+		var theList = ko.observableArray([]);
+		/*
+		for(i=0; i <self.filteredList().length; i++) {
+			theList.push(getNews(self.filteredList()[i]));
+		}
+		return theList(); */
+		theList().push('lucas')
+		console.log(getNews('lucas'))
+		return "hello"
+	});
 }
-
 
 // New York Times api provides news based on description of location
 function getNews(term) {
-	$('.article-list').empty();
 	var NYTKEY = '0f35bca23a904bc7a71e0ac4846e0b3d';
 	var nytimesUrl = 'https://api.nytimes.com/svc/search/v2/articlesearch.json?q=' + term + '&sort=newest&api-key=' + NYTKEY;
-	$.getJSON(nytimesUrl, function(data){
+	result = $.getJSON(nytimesUrl, function(data){
 	    articles = data.response.docs;
-	    //$('.article-list').append('Articles about '+ '<br>' + term);
-	    description = ko.observable(term);
-	    if (articles.length ==0) {
-	    	$('.article-list').append('<br> <br>' + 'There are no articles');
-	    }
-
-	    for (var i = 0; i < articles.length; i ++) {
-	        if (i === 3) { break; }
-	        var article = articles[i];
-	        //Takes out paid death
-	        if (article.section_name != 'Paid Death Notices') {
-	            $('.article-list').append('<li class="article">' +
-	            '<a href="'+article.web_url+'">'+article.headline.main+ '</a>'+
-	                   '</li>');
-	        }
-	        
-	    };
+	    //console.log(articles);
+	    end = articles[0];
+	    return end;
 	})
-	document.getElementById('container').style.height = document.getElementById('articles').style.height;
-	return term;
+	console.log(result)
+	return result;
 }
