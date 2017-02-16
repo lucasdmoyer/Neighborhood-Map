@@ -114,18 +114,6 @@ var ViewModel = function() {
 
     var self = this;
 
-    self.myArticles = ko.observableArray();
-	var nytApiKey = '0f35bca23a904bc7a71e0ac4846e0b3d';
-	var nytBaseUrl = 'https://api.nytimes.com/svc/search/v2/articlesearch.json';
-	var query = "Palo Alto USA";
-	var nytUrl = nytBaseUrl + '?q=' + query + '&sort=newest&' + '&api-key=' + nytApiKey;
-	$.getJSON(nytUrl, function(data) {
-		var articles = data.response.docs;
-		articles.forEach(function(article) {
-			self.myArticles.push(article);
-		});
-	});
-	console.log(self.myArticles())
 
 
     self.filter = ko.observable("");
@@ -174,19 +162,35 @@ var ViewModel = function() {
 			}
 		};
 	}
-}
 
-// New York Times api provides news based on description of location
-function getNews(term) {
-	var NYTKEY = '0f35bca23a904bc7a71e0ac4846e0b3d';
-	var nytimesUrl = 'https://api.nytimes.com/svc/search/v2/articlesearch.json?q=' + term + '&sort=newest&api-key=' + NYTKEY;
-	result = $.getJSON(nytimesUrl, function(data){
-	    articles = data.response.docs;
-	    //console.log(articles);
-	    end = articles[0];
-	    return end;
-	})
-	console.log(result)
-	return result;
-}
+	// Builds a list of articles that have to due with Newport Oregon.
+	self.myArticles = ko.observableArray();
+	var nytApiKey = '0f35bca23a904bc7a71e0ac4846e0b3d';
+	var nytBaseUrl = 'https://api.nytimes.com/svc/search/v2/articlesearch.json';
+	var query = "Newport Oregon";
+	var nytUrl = nytBaseUrl + '?q=' + query + '&sort=newest&' + '&api-key=' + nytApiKey;
+	$.getJSON(nytUrl, function(data) {
+		var articles = data.response.docs;
+		articles.forEach(function(article) {
+			self.myArticles.push(article);
+		});
+	});
 
+	// Filters the list of articles by their headline
+	self.filteredArticles = ko.computed(function(){
+		var filter = self.filter().toLowerCase();
+		var newArticles = []
+		if(!filter){
+			return self.myArticles();
+		} else {
+			var string = self.filter().toLowerCase();
+			for(i=0; i<self.myArticles().length; i ++) {
+				var str2 = self.myArticles()[i].headline.main;
+				if (str2.search(string) >=0) {
+					newArticles.push(self.myArticles()[i])
+				}
+			}
+			return newArticles
+		}
+	}, ViewModel)
+}

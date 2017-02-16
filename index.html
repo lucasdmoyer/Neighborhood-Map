@@ -30,9 +30,10 @@
 
 				<div class="row" id = 'articles'>
 					<h3 id="nytimes-header">News Articles</h3>
-        			<ul data-bind="foreach: myArticles">
+        			<ul data-bind="foreach: filteredArticles">
         				<li>
         					<p data-bind="text: headline.main"></p>
+        					<a href data-bind="text: web_url"></a>
         				</li>
         			</ul>
 				</div>
