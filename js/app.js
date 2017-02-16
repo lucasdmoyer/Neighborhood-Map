@@ -110,7 +110,24 @@ var Location = function(id, name, lat, lng, description) {
 }
 
 var ViewModel = function() {
+
+
     var self = this;
+
+    self.myArticles = ko.observableArray();
+	var nytApiKey = '0f35bca23a904bc7a71e0ac4846e0b3d';
+	var nytBaseUrl = 'https://api.nytimes.com/svc/search/v2/articlesearch.json';
+	var query = "Palo Alto USA";
+	var nytUrl = nytBaseUrl + '?q=' + query + '&sort=newest&' + '&api-key=' + nytApiKey;
+	$.getJSON(nytUrl, function(data) {
+		var articles = data.response.docs;
+		articles.forEach(function(article) {
+			self.myArticles.push(article);
+		});
+	});
+	console.log(self.myArticles())
+
+
     self.filter = ko.observable("");
 	self.locationList = ko.observableArray([]);
 	for (i=0; i<model.locations.length; i++) {
@@ -157,17 +174,6 @@ var ViewModel = function() {
 			}
 		};
 	}
-	self.articleList = ko.computed(function() {
-		var theList = ko.observableArray([]);
-		/*
-		for(i=0; i <self.filteredList().length; i++) {
-			theList.push(getNews(self.filteredList()[i]));
-		}
-		return theList(); */
-		theList().push('lucas')
-		console.log(getNews('lucas'))
-		return "hello"
-	});
 }
 
 // New York Times api provides news based on description of location
@@ -183,3 +189,4 @@ function getNews(term) {
 	console.log(result)
 	return result;
 }
+
