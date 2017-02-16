@@ -174,6 +174,8 @@ var ViewModel = function() {
 		articles.forEach(function(article) {
 			self.myArticles.push(article);
 		});
+	}).fail(function(error) {
+		
 	});
 
 	// Filters the list of articles by their headline
