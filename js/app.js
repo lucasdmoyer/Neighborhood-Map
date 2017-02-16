@@ -79,7 +79,6 @@ var model = {
 }
 // Makes markers bounce when list item is clicked
 function bounce() {
-	getNews(model.gmarkers[this.id].content);
 	model.map[0].setCenter(new google.maps.LatLng(this.lat,this.lng));
 	model.map[0].setZoom( Math.max(17, model.map[0].getZoom()) );
 	model.gmarkers[this.id].setAnimation(google.maps.Animation.BOUNCE);
@@ -91,7 +90,6 @@ function bounce() {
 }
 // Makes markers bounce when marker is clicked
 function animarker(id) {
-	getNews(model.gmarkers[id].content);
 	model.gmarkers[id].setAnimation(google.maps.Animation.BOUNCE);
 	var markerToStop = model.gmarkers[id];
 	setTimeout(function(){
