@@ -84,7 +84,7 @@ var model = {
 }
 // Makes markers bounce when list item is clicked
 function bounce() {
-	ViewModel.term(model.gmarkers[this.id].content)
+	ViewModel.self.term(model.gmarkers[this.id].content)
 	console.log(ViewModel.self.term)
 	model.map[0].setCenter(new google.maps.LatLng(this.lat,this.lng));
 	model.map[0].setZoom( Math.max(17, model.map[0].getZoom()) );
@@ -170,7 +170,7 @@ var ViewModel = function() {
 
 	// Builds a list of articles that have to due with Newport Oregon.
 	self.myArticles = ko.observableArray();
-	self.term = ko.observable('')
+	self.term = ko.observable(model.newstopic)
 	console.log(self.term())
 	var nytApiKey = '0f35bca23a904bc7a71e0ac4846e0b3d';
 	var nytBaseUrl = 'https://api.nytimes.com/svc/search/v2/articlesearch.json';
