@@ -1,3 +1,4 @@
+
 function initMap() {
 	// creates new map centered on Newport, Oregon
 	var map = new google.maps.Map(document.getElementById('map'), {
@@ -37,7 +38,9 @@ function initMap() {
 			infowindow.open(map, this)
 	    });
 	}
-	ko.applyBindings(new ViewModel());
+	
+	var viewModel = new ViewModel();
+	ko.applyBindings(viewModel);
 }
 
 var model = {
@@ -84,7 +87,7 @@ var model = {
 }
 // Makes markers bounce when list item is clicked
 function bounce() {
-	ViewModel.self.term(model.gmarkers[this.id].content)
+	viewModel.term(model.gmarkers[this.id].content)
 	console.log(ViewModel.self.term)
 	model.map[0].setCenter(new google.maps.LatLng(this.lat,this.lng));
 	model.map[0].setZoom( Math.max(17, model.map[0].getZoom()) );
