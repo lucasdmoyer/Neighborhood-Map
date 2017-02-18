@@ -6,8 +6,9 @@ function initMap() {
 			mapTypeId: 'satellite'
 		});
 	model.map.push(map);
+
 	// Adds markers for each location
-	for (i=0; i<model.locations.length; i++) {
+	for (i=0, len = model.locations.length; i<len; i++) {
 		var data = model.locations[i];
 		var latLng = new google.maps.LatLng(data.lat, data.lng);
 		var marker = new google.maps.Marker({
@@ -21,15 +22,19 @@ function initMap() {
 		});
 		model.gmarkers.push(marker);
 	}
+
+	var infowindow = new google.maps.InfoWindow()
+
 	// adds functionality to markers
 	for (i=0; i<model.locations.length; i++) {
 		model.gmarkers[i].addListener('click', function() {
+			model.newstopic = this.content
 			animarker(this.id);
         });
+
 		google.maps.event.addListener(model.gmarkers[i], 'click', function() {
-	        new google.maps.InfoWindow({
-	            content: this.content
-	        }).open(map, this);
+			infowindow.setContent(this.content)
+			infowindow.open(map, this)
 	    });
 	}
 	ko.applyBindings(new ViewModel());
@@ -38,7 +43,7 @@ function initMap() {
 var model = {
 	map: [],
 	gmarkers :[],
-	infowindows:[],
+	newstopic:'',
 	locations: [
         {
             id: 0,
@@ -79,13 +84,15 @@ var model = {
 }
 // Makes markers bounce when list item is clicked
 function bounce() {
+	ViewModel.term(model.gmarkers[this.id].content)
+	console.log(ViewModel.self.term)
 	model.map[0].setCenter(new google.maps.LatLng(this.lat,this.lng));
 	model.map[0].setZoom( Math.max(17, model.map[0].getZoom()) );
 	model.gmarkers[this.id].setAnimation(google.maps.Animation.BOUNCE);
 	var markerToStop = model.gmarkers[this.id];
 	setTimeout(function(){
 		markerToStop.setAnimation(null);
-	}, 1000);
+	}, 1400);
 	
 }
 // Makes markers bounce when marker is clicked
@@ -94,7 +101,7 @@ function animarker(id) {
 	var markerToStop = model.gmarkers[id];
 	setTimeout(function(){
 		markerToStop.setAnimation(null);
-	}, 1000);
+	}, 1400);
 	
 }
 
@@ -163,34 +170,24 @@ var ViewModel = function() {
 
 	// Builds a list of articles that have to due with Newport Oregon.
 	self.myArticles = ko.observableArray();
+	self.term = ko.observable('')
+	console.log(self.term())
 	var nytApiKey = '0f35bca23a904bc7a71e0ac4846e0b3d';
 	var nytBaseUrl = 'https://api.nytimes.com/svc/search/v2/articlesearch.json';
 	var query = "Newport Oregon";
-	var nytUrl = nytBaseUrl + '?q=' + query + '&sort=newest&' + '&api-key=' + nytApiKey;
-	$.getJSON(nytUrl, function(data) {
-		var articles = data.response.docs;
-		articles.forEach(function(article) {
-			self.myArticles.push(article);
+	var nytUrl = nytBaseUrl + '?q=' + self.term() + '&sort=newest&' + '&api-key=' + nytApiKey;
+	self.term.subscribe(function() {
+		console.log(self.term())
+		$.getJSON(nytUrl, function(data) {
+			self.myArticles.removeAll()
+			var articles = data.response.docs;
+			articles.forEach(function(article) {
+				self.myArticles.push(article);
+			});
+		}).fail(function(error) {
+			
 		});
-	}).fail(function(error) {
-		
-	});
+	})
 
-	// Filters the list of articles by their headline
-	self.filteredArticles = ko.computed(function(){
-		var filter = self.filter().toLowerCase();
-		var newArticles = []
-		if(!filter){
-			return self.myArticles();
-		} else {
-			var string = self.filter().toLowerCase();
-			for(i=0; i<self.myArticles().length; i ++) {
-				var str2 = self.myArticles()[i].headline.main;
-				if (str2.search(string) >=0) {
-					newArticles.push(self.myArticles()[i])
-				}
-			}
-			return newArticles
-		}
-	}, ViewModel)
+	
 }
